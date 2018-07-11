@@ -1,12 +1,13 @@
-NAME = malloc
+NAME = a.out
 
 FLAGS = -Wall -Werror -Wextra -g
 
 CC = gcc
 
-SOURCES =	main 
+SOURCES =	main \
+			sources/malloc
 
-INCLUDES =	malloc.h
+INCLUDES =	includes/malloc.h
 
 LIB =	libft/libft.a
 
@@ -24,4 +25,4 @@ clean:
 fclean: clean
 	$(RM) $(NAME)
 
-re: fclean all%
+re: fclean all
