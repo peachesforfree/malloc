@@ -26,7 +26,7 @@
 # define SMALL_INDEX 1
 # define LARGE_INDEX 2
 # define MAX_ALLOCATIONS 200
-
+# define SPACING 1			//this will be used for memory protection i.e. to cause seg faults.
 # define TINY_ZONE	8
 # define SMALL_ZONE 128
 
