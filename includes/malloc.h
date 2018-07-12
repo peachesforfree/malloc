@@ -43,6 +43,7 @@ typedef struct __attribute__((packed))	s_head
 	size_t		page_size;
 	size_t		bytes_per_zone;
 	void		*meta_start;
+	void		*next_zone;
 }										t_head;
 
 void		*g_slabs[3];

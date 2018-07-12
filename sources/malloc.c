@@ -31,10 +31,11 @@ void		init_zone(void *result, size_t p_count, size_t p_size)
 	buffer.page_size = p_size;
 	buffer.bytes_per_zone = (p_count * p_size);
 	buffer.meta_start = (result + sizeof(t_head) + 1);
+	buffer.next_zone = NULL;
 	ft_memcpy(result, &buffer, sizeof(t_head));
 }
 
-void			init_meta_data(void *start, size_t chunk_size)
+void			*init_meta_data(void *start, size_t chunk_size)
 {
 	t_chunk		buffer;
 
@@ -43,6 +44,7 @@ void			init_meta_data(void *start, size_t chunk_size)
 	buffer.chunk_start = (start + sizeof(t_chunk) + 1);
 	buffer.next_chunk = NULL;
 	ft_memcpy(start, &buffer, sizeof(t_chunk));
+	return (&start);
 }
 
 void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
@@ -59,25 +61,89 @@ void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
 	return (result);
 }
 
+void		address_testing(int index)
+{
+	t_head	*head;
+	t_chunk	*chunk;
+
+	head = g_slabs[index];
+	chunk = head->meta_start;
+	printf("\nAddress:\t%p\n\tzone_start:%p\tmeta start:%p\tchunk start:%p\n",
+	g_slabs[index], head, head->meta_start, chunk->chunk_start);
+	printf("zone meta:%lu\tchunk meta:%lu\n", sizeof(t_head), sizeof(t_chunk));
+}
+
+t_chunk		*look_for_free(t_head *top_slab, size_t size)
+{
+	t_chunk	*chunk;
+
+	chunk = top_slab->meta_start;
+	while (chunk->used == 1 && (chunk->size < size) && (chunk->next_chunk != NULL))
+		chunk = (t_chunk*)chunk->next_chunk;
+	if (chunk->used == 1 && chunk->next_chunk == NULL)
+	{
+		if (top_slab + top_slab->bytes_per_zone > (chunk + sizeof(chunk) + size))
+			chunk->next_chunk = init_meta_data(chunk + size + 1, size);
+	}
+	if (chunk->size <= size)
+		chunk->used = 1;
+	return(chunk);
+}
+
+t_chunk		*cut_new_chunk(t_head *top_slab)
+{
+	t_chunk	*chunk;
+
+	chunk = top_slab->chunk_start;
+
+	return (chunk);
+}
+
+
+/*
+*this checks the slab for a free piece
+*is no free chunks available , it will cut new one at end of used block
+*
+*/
+
+void		*cut_chunk_from_slab(int index, size_t size)
+{
+	void	*result;
+	t_chunk	*chunk;
+	t_head	*top_slab;
+
+//	if (index == LARGE_INDEX)
+//	{
+//		top_slab = add_slab();
+//		chunk = cut_new_chunk(top_slab);
+//		return (chunk);
+//	}
+	top_slab = g_slabs[index];
+	chunk = look_for_free(top_slab, size);
+	if (chunk == NULL)
+		chunk = cut_new_chunk(top_slab);
+/*	if (chunk == NULL) //no free chunks, nor chunk space
+	{
+		top_slab = create_slab(top_slab->bytes_per_zone /
+		top_slab->pag_size, top_slab->page_size, size);
+		chunk = top_slab->meta_start;
+	}*/
+	return (result->chunk_start);
+}
+
 void		*check_slab(int index, size_t size)
 {
 	void	*result = NULL;
-	
 
 	if (g_slabs[index] == NULL)
 		g_slabs[index] = create_slab(get_page_req(index, size), getpagesize(), size);
 	if (g_slabs[index] == NULL)
 		return (NULL);
-/*	result = cut_chunk_from_slab();
+	result = cut_chunk_from_slab(index, size);
 	if (result == NULL)
 		stack_new_slab();
-	//maybe check here for errors ?*/
-	t_head	*head;
-	t_chunk	*chunk;
-	head = g_slabs[index];
-	chunk = head->meta_start;
-	printf("\nAddress:\t%p\n\tzone_start: %p\tmeta start: %p\tchunk start: %p\n", g_slabs[index], head, head->meta_start, chunk->chunk_start);
-	printf("zone meta: %lu\tchunk meta: %lu\n", sizeof(t_head), sizeof(t_chunk));
+	//maybe check here for errors ?
+	address_testing(index);
 	return (result);
 }
 
