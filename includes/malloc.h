@@ -26,20 +26,26 @@
 # define SMALL_INDEX 1
 # define LARGE_INDEX 2
 # define MAX_ALLOCATIONS 200
-
+# define SPACING 1			//this will be used for memory protection i.e. to cause seg faults.
 # define TINY_ZONE	8
 # define SMALL_ZONE 128
 
 typedef struct	__attribute__((packed))	s_table
 {
 	size_t		len;
-	uint8_t		used;
-	uint8_t		index;
-	void		*page_start;
-	void		*next_allocation;
+	char		used;
+	void		*chunk_start;
+	void		*next_meta;
+	void		*next_zone;
 }										t_table;
 
-extern void		*g_slabs[3];
+typedef struct __attribute((packed))	s_zone
+{
+	size_t	zone_size;
+	void	*meta_start;
+}										t_zone;
+
+void		*g_slabs[3];
 
 //void	free(void *ptr);
 void	*malloc(size_t size);

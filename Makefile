@@ -1,28 +1,41 @@
-NAME = a.out
+NAME = malloc.exe
 
-FLAGS = -Wall -Werror -Wextra -g
+FILE		=	main \
+				malloc
 
-CC = gcc
+OBJFILES	= $(FILE:%=%.o)
+SRCFILES	= $(FILE:%=%.c)
+SRC			= $(addprefix sources/,$(SRCFILES))
+OBJ			= $(addprefix obj/,$(OBJFILES))
+CC			= gcc
+FLAGS		= -g -Wextra -Wall -Werror
+INC			= -I libft/inc -I includes/
+LIB			= -L libft/
 
-SOURCES =	main \
-			sources/malloc
+all:$(NAME)
 
-INCLUDES =	includes/malloc.h
+$(NAME): $(OBJ)
+	make -C libft/
+	$(CC) $(FLAGS) -o $@ $^ $(LIB)
 
-LIB =	libft/libft.a
+objdir:
+	mkdir -p obj/
 
-RM = rm -Rf
+obj/%.o: $(SRC) | objdir
+	mkdir -p obj/ && $(CC) $(FLAGS) -c $< -o $@ $(INC)
 
-$(NAME):
-	$(CC) $(FLAGS) -c $(addsuffix .c,$(SOURCES))
-	$(CC) $(addsuffix .o,$(SOURCES)) -I$(INCLUDES) $(LIB) -o $(NAME)
+rmobj:
+	rm -rf obj/
 
-all: $(NAME)
+rmbin:
+	rm -rf $(NAME)
 
-clean:
-	$(RM) $(addsuffix .o,$(SOURCES))
+again: rmobj rmbin all
 
-fclean: clean
-	$(RM) $(NAME)
+clean: rmobj
+	make clean -C libft/
+
+fclean: clean rmbin
+	make fclean -C libft/
 
 re: fclean all
