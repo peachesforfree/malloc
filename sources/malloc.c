@@ -17,17 +17,10 @@ int			get_page_req(int index, size_t size)
 	int	pagesize;
 
 	pagesize = getpagesize();
-	printf("Pagesize: %d\t\tsizeof_table: %lu", pagesize, sizeof(t_table));
 	if (index == TINY_INDEX)
-	{
-		printf(" sabsize: %lu\t", (TINY_ZONE + sizeof(t_table)) * MAX_ALLOCATIONS);
 		return (((TINY_ZONE + sizeof(t_table)) * MAX_ALLOCATIONS) / pagesize);
-	}
 	if (index == SMALL_INDEX)
-	{
-		printf(" sabsize: %lu\t", (SMALL_ZONE + sizeof(t_table)) * MAX_ALLOCATIONS);
 		return (((SMALL_ZONE + sizeof(t_table)) * MAX_ALLOCATIONS) / pagesize);
-	}
 	return ((size + sizeof(t_table)) / pagesize);
 }
 
@@ -37,9 +30,9 @@ void		*check_slab(int index, size_t size)
 	size_t	pages;
 
 	pages = get_page_req(index, size);
-	/*if (g_slabs[index] == NULL)
+	if (g_slabs[index] == NULL)
 		g_slabs[index] = create_slab(index, pages);
-	result = cut_chunk_from_slab();
+/*	result = cut_chunk_from_slab();
 	if (result == NULL)
 		stack_new_slab();
 	//maybe check here for errors ?*/
