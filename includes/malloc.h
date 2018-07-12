@@ -30,16 +30,22 @@
 # define TINY_ZONE	8
 # define SMALL_ZONE 128
 
-typedef struct	__attribute__((packed))	s_table
+typedef struct	__attribute__((packed))	s_chunk
 {
-	size_t		len;
+	size_t		size;
 	uint8_t		used;
-	uint8_t		index;
-	void		*page_start;
-	void		*next_allocation;
-}										t_table;
+	void		*chunk_start;
+	void		*next_chunk;
+}										t_chunk;
 
-extern void		*g_slabs[3];
+typedef struct __attribute__((packed))	s_head
+{
+	size_t		page_size;
+	size_t		bytes_per_zone;
+	void		*chunk_start;
+}										t_head;
+
+void		*g_slabs[3];
 
 //void	free(void *ptr);
 void	*malloc(size_t size);

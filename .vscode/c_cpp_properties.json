@@ -15,7 +15,11 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
-        }
+		},
+		"path-intellisense.mappings": {
+        "/": "${workspaceRoot}",
+        "lib": "${workspaceRoot}/libft"
+    },
     ],
     "version": 4
 }
