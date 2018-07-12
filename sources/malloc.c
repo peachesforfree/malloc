@@ -30,7 +30,7 @@ void		init_zone(void *result, size_t p_count, size_t p_size)
 
 	buffer.page_size = p_size;
 	buffer.bytes_per_zone = (p_count * p_size);
-	buffer.chunk_start = (result + sizeof(t_head) + 1);
+	buffer.meta_start = (result + sizeof(t_head) + 1);
 	ft_memcpy(result, &buffer, sizeof(t_head));
 }
 
@@ -55,13 +55,14 @@ void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
 		return (NULL);
 	init_zone(result, page_count, page_size);
 	head = result;
-	init_meta_data(head->chunk_start, chunk_size);
+	init_meta_data(head->meta_start, chunk_size);
 	return (result);
 }
 
 void		*check_slab(int index, size_t size)
 {
 	void	*result = NULL;
+	
 
 	if (g_slabs[index] == NULL)
 		g_slabs[index] = create_slab(get_page_req(index, size), getpagesize(), size);
@@ -71,7 +72,12 @@ void		*check_slab(int index, size_t size)
 	if (result == NULL)
 		stack_new_slab();
 	//maybe check here for errors ?*/
-	printf("\t\tPages_req: %zu\n", get_page_req(index, size));
+	t_head	*head;
+	t_chunk	*chunk;
+	head = g_slabs[index];
+	chunk = head->meta_start;
+	printf("\nAddress:\t%p\n\tzone_start: %p\tmeta start: %p\tchunk start: %p\n", g_slabs[index], head, head->meta_start, chunk->chunk_start);
+	printf("zone meta: %lu\tchunk meta: %lu\n", sizeof(t_head), sizeof(t_chunk));
 	return (result);
 }
 
