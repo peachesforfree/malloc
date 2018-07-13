@@ -30,7 +30,7 @@ void		init_zone(void *result, size_t p_count, size_t p_size)
 
 	buffer.page_size = p_size;
 	buffer.bytes_per_zone = (p_count * p_size);
-	buffer.meta_start = (result + sizeof(t_head) + 1);
+	buffer.meta_start = (result + sizeof(t_head) + SAFEZONE);
 	buffer.next_zone = NULL;
 	ft_memcpy(result, &buffer, sizeof(t_head));
 }
@@ -41,7 +41,7 @@ void			*init_meta_data(void *start, size_t chunk_size)
 
 	buffer.size = chunk_size;
 	buffer.used = 0;
-	buffer.chunk_start = (start + sizeof(t_chunk) + 1);
+	buffer.chunk_start = (start + sizeof(t_chunk) + SAFEZONE);
 	buffer.next_chunk = NULL;
 	ft_memcpy(start, &buffer, sizeof(t_chunk));
 	return (&start);
@@ -73,21 +73,41 @@ void		address_testing(int index)
 	printf("zone meta:%lu\tchunk meta:%lu\n", sizeof(t_head), sizeof(t_chunk));
 }
 
+/*
+** Cycles thru all chunks on list
+**	if no free chunk is available on slab
+**	to to next slab and cycle through
+**	if no space at all, return NULL
+**	else pointer to next chunk is returned
+*/
+
 t_chunk		*look_for_free(t_head *top_slab, size_t size)
 {
 	t_chunk	*chunk;
 
-	chunk = top_slab->meta_start;
-	while (chunk->used == 1 && (chunk->size < size) && (chunk->next_chunk != NULL))
-		chunk = (t_chunk*)chunk->next_chunk;
-	if (chunk->used == 1 && chunk->next_chunk == NULL)
+	//cycle through all zones
+	while (top_slab != NULL)
 	{
-		if (top_slab + top_slab->bytes_per_zone > (chunk + sizeof(chunk) + size))
-			chunk->next_chunk = init_meta_data(chunk + size + 1, size);
+		chunk = top_slab->meta_start;
+		//cycle through all chunks in zone
+		while ((chunk->next_chunk != NULL) && chunk->used == 1 && (chunk->size <= size))
+			chunk = (t_chunk*)chunk->next_chunk;
+		//if current pointed to chunk is open and good size
+		if (chunk->used == 0 && chunk->size <= size)
+		{
+			chunk->used = 1;
+			return (chunk->chunk_start);
+		}
+		//if at end of chunks but still space in zone
+		//takes current chunk addres, adds all numbers for soon to be chunk
+		else if (chunk->used == 1 &&
+		((chunk + sizeof(t_chunk) + SAFEZONE + size) < top_slab->bytes_per_zone))
+			chunk = init_meta_data(chunk + sizeof(t_chunk) + SAFEZONE + size, size);
+		//if at end of zone and chunks
+		if (top_slab->next_zone != NULL)
+			top_slab = top_slab->next_zone;
 	}
-	if (chunk->size <= size)
-		chunk->used = 1;
-	return(chunk);
+	return (NULL);
 }
 
 t_chunk		*cut_new_chunk(t_head *top_slab)

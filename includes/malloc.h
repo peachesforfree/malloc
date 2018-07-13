@@ -29,6 +29,7 @@
 # define SPACING 1			//this will be used for memory protection i.e. to cause seg faults.
 # define TINY_ZONE	8
 # define SMALL_ZONE 128
+# define SAFEZONE	1
 
 typedef struct	__attribute__((packed))	s_chunk
 {
