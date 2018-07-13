@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
+#include <time.h>
 
 /*
 *	#include <sys/mman.h>
@@ -32,11 +33,23 @@
 
 int		main(int argc, char **argv)
 {
-	int size;
-	void	*shit;
+	int count;
 	(void)argc;
+	void	*shit;
+	int		i;
+	int		random;
+	time_t	t;
 
-	size = ft_atoi(argv[1]);
-	shit = malloc(size);
+	i = 0;
+	count = ft_atoi(argv[1]);
+	srand((unsigned) time(&t));
+	while (i <= count)
+	{	
+		random = (rand() % 7);
+		printf("Random input: %d\n", random);
+		shit = malloc((size_t)random);
+		printf("Back to main\n\n");
+		i++;
+	}
 	return (0);
 }
