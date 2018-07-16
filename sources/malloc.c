@@ -10,6 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
+
+	see comment line 67
+
+*/
+
 #include "../includes/malloc.h"
 
 size_t			get_page_req(int index, size_t size)
@@ -58,6 +64,7 @@ void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
 	t_head	*head;
 	t_chunk *chunk;
 
+//insert here if index is 2 (LARGE_INDEX) then need to make custom size allocation
 	result = mmap(NULL, (page_count * page_size), PROT_ALL, FT_MAP_ANON, -1, 0);
 	if (result == NULL)
 		return (NULL);
@@ -124,17 +131,6 @@ t_chunk		*look_for_free(t_head *top_slab, size_t size)
 	return (NULL);
 }
 
-t_chunk		*cut_new_chunk(t_head *top_slab)
-{
-	t_chunk	*chunk;
-	t_head	*head;
-
-	head = top_slab;
-	chunk = head->meta_start;
-
-	return (chunk);
-}
-
 //void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
 void		*allocate_new_zone(size_t page_req, t_head *head, size_t size)
 {
@@ -155,17 +151,40 @@ void		*allocate_new_zone(size_t page_req, t_head *head, size_t size)
 *
 */
 
+void		*allocate_large_slab(t_head *head, int index, size_t size)
+{
+	t_chunk	*chunk;
+
+	if (head != NULL)
+	{
+		while (head != NULL && head->next_zone != NULL)
+			head = head->next_zone;
+		head->next_zone = (t_head*)create_slab(get_page_req(index, size), getpagesize(), size);
+		if (head->next_zone != NULL)
+			head = head->next_zone;
+		else 
+			return (NULL); //error with allocating memory
+	}
+	else
+	{
+		head = (t_head*)create_slab(get_page_req(index, size), getpagesize(), size);
+		chunk = head->meta_start;
+	}
+	chunk = head->meta_start;
+	return (chunk->chunk_start);
+}
+
 void		*cut_chunk_from_slab(int index, size_t size)
 {
 	t_chunk	*chunk;
 	t_head	*top_slab;
 
-//	if (index == LARGE_INDEX)
-//	{
-//		top_slab = add_slab();
-//		chunk = cut_new_chunk(top_slab);
-//		return (chunk);
-//	}
+	if (index == LARGE_INDEX)
+	{
+		top_slab = allocate_large_slab(g_slabs[index], index, size);
+		chunk = top_slab->meta_start;
+		return (chunk->chunk_start);
+	}
 	//looks for free chunk, return null if out of memory in the zone
 	top_slab = g_slabs[index];
 	chunk = look_for_free(top_slab, size);

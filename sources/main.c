@@ -45,7 +45,7 @@ int		main(int argc, char **argv)
 	srand((unsigned) time(&t));
 	while (i <= count)
 	{	
-		random = (rand() % 7);
+		random = (rand() % 150);
 		printf("Random input: %d\n", random);
 		shit = malloc((size_t)random);
 		printf("Back to main\n\n");

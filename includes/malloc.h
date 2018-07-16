@@ -46,7 +46,12 @@ typedef struct __attribute__((packed))	s_head
 	void		*next_zone;
 }										t_head;
 
-void		*g_slabs[3];
+void		*g_slabs[3] =
+{
+	[0] = NULL,
+	[1] = NULL,
+	[2] = NULL,
+};
 
 //void	free(void *ptr);
 void	*malloc(size_t size);
