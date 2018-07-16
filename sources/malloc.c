@@ -75,12 +75,6 @@ void			*enough_space_in_zone(t_head *top_slab, t_chunk *chunk, size_t size)
 	void	*new_chunk_start;
 	void	*new_chunk_end;
 
-/*
- **
- *			problem right here,  not getting proper address when adding top_slab and top_slab->bytes_per_zone
- * *
- * *
- */
 	zone_end = top_slab;
 	zone_end += top_slab->bytes_per_zone;
 	new_chunk_start = chunk->chunk_start + (chunk->size + SAFEZONE);
@@ -93,7 +87,7 @@ void			*enough_space_in_zone(t_head *top_slab, t_chunk *chunk, size_t size)
 /*
 ** Cycles thru all chunks on list
 **	if no free chunk is available on slab
-**	to to next slab and cycle through
+**	then next slab and cycle through
 **	if no space at all, return NULL
 **	else pointer to next chunk is returned
 */
@@ -123,12 +117,9 @@ t_chunk		*look_for_free(t_head *top_slab, size_t size)
 			//below, change this to a function that will automatically jump ahead of current meta data pointer and set the new one in place, and return it
 			chunk = init_meta_data(new_meta, size, chunk);
 			chunk->used = 1;
-			return (chunk);
+			return (chunk->chunk_start);
 		}
-		else if (new_meta == NULL)
-			return (NULL);
-		if (top_slab->next_zone != NULL)
-			top_slab = top_slab->next_zone;
+		top_slab = top_slab->next_zone;
 	}
 	return (NULL);
 }
@@ -142,6 +133,20 @@ t_chunk		*cut_new_chunk(t_head *top_slab)
 	chunk = head->meta_start;
 
 	return (chunk);
+}
+
+//void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
+void		*allocate_new_zone(size_t page_req, t_head *head, size_t size)
+{
+	t_head		*new_zone;
+	t_chunk		*chunk;
+
+	while (head->next_zone != NULL)
+		head = head->next_zone;
+	new_zone = (t_head*)create_slab(page_req, head->page_size, size);
+	head->next_zone = new_zone;
+	chunk = new_zone->meta_start;
+	return (chunk->chunk_start);
 }
 
 /*
@@ -166,9 +171,6 @@ void		*cut_chunk_from_slab(int index, size_t size)
 	chunk = look_for_free(top_slab, size);
 	if (chunk == NULL)
 		return(NULL);	//there was an error with mmap
-	//chunk = !(allocate_new_zone(top_slab));
-	//if (chunk == NULL)
-	//	return (NULL);
 	return (chunk);
 }
 
@@ -180,11 +182,10 @@ void		*check_slab(int index, size_t size)
 		g_slabs[index] = create_slab(get_page_req(index, size), getpagesize(), size);
 	else if (g_slabs[index] == NULL)
 		return (NULL);
-	else
-		result = look_for_free(g_slabs[index], size);
-//		result = cut_chunk_from_slab(index, size);
-//	if (result == NULL)
-//		stack_new_slab();
+	result = look_for_free(g_slabs[index], size);
+	//make sure above is returning chunk_start pointer
+	if (result == NULL && size > 0)
+		result = allocate_new_zone(get_page_req(index, size), g_slabs[index], size);
 	//maybe check here for errors ?
 	return (result);
 }
