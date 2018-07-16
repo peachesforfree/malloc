@@ -33,7 +33,7 @@ void		init_zone(void *result, size_t p_count, size_t p_size)
 	buffer.meta_start = (result + sizeof(t_head) + SAFEZONE);
 	buffer.next_zone = NULL;
 	ft_memcpy(result, &buffer, sizeof(t_head));
-	//printf("\t\tHeadvar\tstart: %p\tmeta_start:%p\tnext_zone:%p\tend zone addr: %p\n\n", result, buffer.meta_start, buffer.next_zone, result + buffer.bytes_per_zone);
+	printf("\t\tHeadvar\tstart: %p\tmeta_start:%p\tnext_zone:%p\tend zone addr: %p\n\n", result, buffer.meta_start, buffer.next_zone, result + buffer.bytes_per_zone);
 }
 
 t_chunk			*init_meta_data(void *start, size_t chunk_size, t_chunk *last)
@@ -47,8 +47,8 @@ t_chunk			*init_meta_data(void *start, size_t chunk_size, t_chunk *last)
 	if (last != NULL)
 		last->next_chunk = start;
 	ft_memcpy(start, &buffer, sizeof(t_chunk));
-	//printf("\t\tmetavar\tloc: %p\tsize:%zu\tused: %d\tchunk_start: %p\tnext_chunk: %p\n", start, buffer.size, buffer.used, buffer.chunk_start, buffer.next_chunk);
-	//printf("\t\tSizeof(t_chunk)=%zu\tnext_metaptr:%p\n\n", sizeof(t_chunk), buffer.chunk_start + (chunk_size + SAFEZONE));
+	printf("\t\tmetavar\tloc: %p\tsize:%zu\tused: %d\tchunk_start: %p\tnext_chunk: %p\n", start, buffer.size, buffer.used, buffer.chunk_start, buffer.next_chunk);
+	printf("\t\tSizeof(t_chunk)=%zu\tnext_metaptr:%p\n\n", sizeof(t_chunk), buffer.chunk_start + (chunk_size + SAFEZONE));
 	return (start);
 }
 
@@ -81,7 +81,8 @@ void			*enough_space_in_zone(t_head *top_slab, t_chunk *chunk, size_t size)
  * *
  * *
  */
-	zone_end = top_slab + top_slab->bytes_per_zone;
+	zone_end = top_slab;
+	zone_end += top_slab->bytes_per_zone;
 	new_chunk_start = chunk->chunk_start + (chunk->size + SAFEZONE);
 	new_chunk_end = new_chunk_start + (sizeof(t_chunk) + size + SAFEZONE);
 	if (new_chunk_end < zone_end)
@@ -123,7 +124,9 @@ t_chunk		*look_for_free(t_head *top_slab, size_t size)
 			chunk = init_meta_data(new_meta, size, chunk);
 			chunk->used = 1;
 			return (chunk);
-		}//if at end of zone and chunks
+		}
+		else if (new_meta == NULL)
+			return (NULL);
 		if (top_slab->next_zone != NULL)
 			top_slab = top_slab->next_zone;
 	}
