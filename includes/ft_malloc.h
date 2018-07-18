@@ -10,9 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-#ifndef MALLOC_H
-# define MALLOC_H
+#ifndef FT_MALLOC_H
+# define FT_MALLOC_H
 
 # include <stdio.h>
 # include <unistd.h>
@@ -22,14 +21,14 @@
 
 # define PROT_ALL (PROT_READ | PROT_WRITE | PROT_EXEC)
 # define FT_MAP_ANON (MAP_ANONYMOUS | MAP_PRIVATE | MAP_NOCACHE)
-# define TINY_INDEX 0
-# define SMALL_INDEX 1
-# define LARGE_INDEX 2
-# define MAX_ALLOCATIONS 300
-# define TINY_ZONE	8
-# define SMALL_ZONE 128
-# define SAFEZONE	1
-
+# define TINY_INDEX		0
+# define SMALL_INDEX	1
+# define LARGE_INDEX	2
+# define MAX_ALLOCATIONS	300
+# define TINY_ZONE		8
+# define SMALL_ZONE		128
+# define SAFEZONE		1
+# define INDEX_COUNT	3
 typedef struct	__attribute__((packed))	s_chunk
 {
 	size_t		size;
@@ -46,16 +45,13 @@ typedef struct __attribute__((packed))	s_head
 	void		*next_zone;
 }										t_head;
 
-void		*g_slabs[3] =
-{
-	[0] = NULL,
-	[1] = NULL,
-	[2] = NULL,
-};
+extern void		*g_slabs[INDEX_COUNT];
 
-//void	free(void *ptr);
-void	*malloc(size_t size);
+void	ft_free(void *ptr);
+void	*ft_malloc(size_t size);
 //void	*realloc(void *ptr, size_t size);
 //void	show_alloc_mem();
+int		main(int argc, char **argv);
+
 
 #endif

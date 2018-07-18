@@ -2,11 +2,12 @@ NAME = malloc.exe
 
 CFLAGS = -Wall -Wextra -Werror -g
 
-
 OBJ_FILES = $(SRCS:%=%.o)
 SRC_FILES = $(SRCS:%=%.c)
 SRCS =	main \
-		malloc 
+		malloc \
+		ft_free
+
 SRC_DIR = ./sources/
 OBJ_DIR = ./obj/
 INC_DIR = ./includes/
@@ -20,24 +21,24 @@ LIBFT = $(addprefix $(LIBFT_DIR), libft.a)
 all: obj $(LIBFT) $(NAME)
 
 obj:
-	@mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)
 
 $(OBJ_DIR)%.o:$(SRC_DIR)%.c
 	gcc $(CFLAGS) -I $(INC_DIR) -o $@ -c $<
 
 $(LIBFT):
-	@make -C $(LIBFT_DIR)
+	make -C $(LIBFT_DIR)
 
 $(NAME): $(OBJ)
 	gcc $(OBJ) $(LIBFT) -lm -o $(NAME)
 
 clean:
-	@rm -rf $(OBJ_DIR)
-	@make -C $(LIBFT_DIR) clean
+	rm -rf $(OBJ_DIR)
+	make -C $(LIBFT_DIR) clean
 
 fclean: clean
-	@rm -f $(NAME)
-	@make -C $(LIBFT_DIR) fclean
+	rm -f $(NAME)
+	make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 

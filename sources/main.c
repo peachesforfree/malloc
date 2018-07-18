@@ -49,6 +49,7 @@ int		main(int argc, char **argv)
 		printf("Random input: %d\n", random);
 		shit = ft_malloc((size_t)random);
 		printf("ADDR: %p\tsize: %d\n", shit, random);
+		ft_free(shit);
 		i++;
 	}
 	return (0);

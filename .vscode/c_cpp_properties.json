@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-				"/includes",
+				"${workspaceFolder}/includes/",
                 "${workspaceFolder}/libft"
             ],
             "defines": [],
