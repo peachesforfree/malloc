@@ -10,24 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
+#include "../includes/ft_malloc.h"
 
-	see comment line 67
-
-*/
-
-#include "../includes/malloc.h"
+void	*g_slabs[3] = {	NULL, NULL, NULL};
 
 size_t			get_page_req(int index, size_t size)
 {
 	int	pagesize;
+	int large;
 
 	pagesize = getpagesize();
 	if (index == TINY_INDEX)
 		return (((TINY_ZONE + sizeof(t_chunk)) * MAX_ALLOCATIONS) / pagesize);
 	if (index == SMALL_INDEX)
 		return (((SMALL_ZONE + sizeof(t_chunk)) * MAX_ALLOCATIONS) / pagesize);
-	return ((size + sizeof(t_chunk)) / pagesize);
+	if (index == LARGE_INDEX)
+	{
+		large = ((size + sizeof(t_chunk)) / pagesize);
+		if (large == 0)
+			large = 1;
+		return (large);
+	}
+	return (0);
 }
 
 void		init_zone(void *result, size_t p_count, size_t p_size)
@@ -39,7 +43,7 @@ void		init_zone(void *result, size_t p_count, size_t p_size)
 	buffer.meta_start = (result + sizeof(t_head) + SAFEZONE);
 	buffer.next_zone = NULL;
 	ft_memcpy(result, &buffer, sizeof(t_head));
-	printf("\t\tHeadvar\tstart: %p\tmeta_start:%p\tnext_zone:%p\tend zone addr: %p\n\n", result, buffer.meta_start, buffer.next_zone, result + buffer.bytes_per_zone);
+	//printf("\t\tHeadvar\tstart: %p\tmeta_start:%p\tnext_zone:%p\tend zone addr: %p\n\n", result, buffer.meta_start, buffer.next_zone, result + buffer.bytes_per_zone);
 }
 
 t_chunk			*init_meta_data(void *start, size_t chunk_size, t_chunk *last)
@@ -53,8 +57,8 @@ t_chunk			*init_meta_data(void *start, size_t chunk_size, t_chunk *last)
 	if (last != NULL)
 		last->next_chunk = start;
 	ft_memcpy(start, &buffer, sizeof(t_chunk));
-	printf("\t\tmetavar\tloc: %p\tsize:%zu\tused: %d\tchunk_start: %p\tnext_chunk: %p\n", start, buffer.size, buffer.used, buffer.chunk_start, buffer.next_chunk);
-	printf("\t\tSizeof(t_chunk)=%zu\tnext_metaptr:%p\n\n", sizeof(t_chunk), buffer.chunk_start + (chunk_size + SAFEZONE));
+	//printf("\t\tmetavar\tloc: %p\tsize:%zu\tused: %d\tchunk_start: %p\tnext_chunk: %p\n", start, buffer.size, buffer.used, buffer.chunk_start, buffer.next_chunk);
+	//printf("\t\tSizeof(t_chunk)=%zu\tnext_metaptr:%p\n\n", sizeof(t_chunk), buffer.chunk_start + (chunk_size + SAFEZONE));
 	return (start);
 }
 
@@ -68,7 +72,7 @@ void		*create_slab(size_t page_count, size_t page_size, size_t chunk_size)
 	result = mmap(NULL, (page_count * page_size), PROT_ALL, FT_MAP_ANON, -1, 0);
 	if (result == NULL)
 		return (NULL);
-	printf("\tCreating new slab: %p\n", result);
+	//printf("\tCreating new slab: %p\n", result);
 	init_zone(result, page_count, page_size);
 	head = result;
 	chunk = init_meta_data(head->meta_start, chunk_size, NULL);
@@ -209,20 +213,13 @@ void		*check_slab(int index, size_t size)
 	return (result);
 }
 
-void		*malloc(size_t size)
+void		*ft_malloc(size_t size)
 {
 	if (size == 0)
-		return(NULL);
+		return (NULL);
 	if (size <= TINY_ZONE)
 		return (check_slab(TINY_INDEX, size));
 	if (size <= SMALL_ZONE)
 		return (check_slab(SMALL_INDEX, size));
 	return (check_slab(LARGE_INDEX, size));
 }
-
-/*
-**	Check list
-**		make function that will allocate new zone if out of memory in the zone
-**		
-**
-*/

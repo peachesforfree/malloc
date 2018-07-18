@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/malloc.h"
+#include "../includes/ft_malloc.h"
 #include <time.h>
 
 /*
@@ -44,11 +44,11 @@ int		main(int argc, char **argv)
 	count = ft_atoi(argv[1]);
 	srand((unsigned) time(&t));
 	while (i <= count)
-	{	
+	{
 		random = (rand() % 150);
 		printf("Random input: %d\n", random);
-		shit = malloc((size_t)random);
-		printf("Back to main\n\n");
+		shit = ft_malloc((size_t)random);
+		printf("ADDR: %p\tsize: %d\n", shit, random);
 		i++;
 	}
 	return (0);
