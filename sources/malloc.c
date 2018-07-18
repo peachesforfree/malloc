@@ -164,10 +164,9 @@ void		*allocate_large_slab(t_head *head, int index, size_t size)
 		while (head != NULL && head->next_zone != NULL)
 			head = head->next_zone;
 		head->next_zone = (t_head*)create_slab(get_page_req(index, size), getpagesize(), size);
-		if (head->next_zone != NULL)
-			head = head->next_zone;
-		else 
+		if (head->next_zone == NULL)
 			return (NULL); //error with allocating memory
+		head = head->next_zone;	
 	}
 	else
 	{

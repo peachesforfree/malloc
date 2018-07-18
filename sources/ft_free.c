@@ -19,7 +19,7 @@ void	*evaluate_zone(t_head *header, void *ptr)
 	chunk = header->meta_start;
 	while (chunk != NULL)
 	{
-		if (chunk->chunk_start == ptr)
+		if (chunk->chunk_start == ptr && (chunk->used == 1))
 			return (ptr);
 		chunk = chunk->next_chunk;
 	}
@@ -29,13 +29,16 @@ void	*evaluate_zone(t_head *header, void *ptr)
 void	*find_ptr(void *ptr, int *index)
 {
 	t_head		*header;
+	void		*test;
 
 	while (*index <= INDEX_COUNT)
 	{
 		header = g_slabs[*index];
 		while (header)
 		{
-			if (((void*)header < ptr) && (ptr < (void*)(header + header->bytes_per_zone)))
+			test = (void*)header;
+			test += header->bytes_per_zone;
+			if (((void*)header < ptr) && (ptr < test))
 				return (evaluate_zone(header, ptr));
 			header = header->next_zone;
 		}
@@ -53,5 +56,6 @@ void	ft_free(void *ptr)
 	if (ptr == NULL)
 		return ;
 	result = find_ptr(ptr, &index);
+	//dealocate(result);
 	printf("\t\t\t\tINDEX: %d\tresult: %p\n", index, result);
 }
