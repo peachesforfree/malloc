@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-				"${workspaceFolder}/includes/",
+                "${workspaceFolder}/includes/",
                 "${workspaceFolder}/libft"
             ],
             "defines": [],
@@ -15,7 +15,7 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
-		}
+        }
     ],
-    "version": 4
+    "version": 3
 }

@@ -35,21 +35,28 @@ int		main(int argc, char **argv)
 {
 	int count;
 	(void)argc;
-	void	*shit;
+//	void	*shit;
 	int		i;
-	int		random;
+//	int		random;
 	time_t	t;
+	int		number[12] = {1, 5, 7, 7, 1, 8, 7, 6, 5, 6, 6, 2};
+	void	*ptr[12];
 
 	i = 0;
 	count = ft_atoi(argv[1]);
 	srand((unsigned) time(&t));
-	while (i <= count)
+	while (i < 12)
 	{
-		random = (rand() % 150);
-		printf("Random input: %d\n", random);
-		shit = ft_malloc((size_t)random);
-		printf("ADDR: %p\tsize: %d\n", shit, random);
-		ft_free(shit);
+//		random = (rand() % 150);
+//		printf("%d, ", random);
+		ptr[i] = ft_malloc(number[i]);
+		//printf("ADDR: %p\tsize: %d\n", shit, random);
+		i++;
+	}
+	i = 0;
+	while (i < 12)
+	{
+		free(ptr[i]);
 		i++;
 	}
 	return (0);
