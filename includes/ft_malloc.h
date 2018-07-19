@@ -49,7 +49,7 @@ extern void		*g_slabs[INDEX_COUNT];
 
 void	ft_free(void *ptr);
 void	*ft_malloc(size_t size);
-//void	*realloc(void *ptr, size_t size);
+void	*realloc(void *ptr, size_t size);
 //void	show_alloc_mem();
 int		main(int argc, char **argv);
 

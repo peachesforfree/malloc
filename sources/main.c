@@ -56,7 +56,7 @@ int		main(int argc, char **argv)
 	i = 0;
 	while (i < 12)
 	{
-		free(ptr[i]);
+		ft_free(ptr[i]);
 		i++;
 	}
 	return (0);
