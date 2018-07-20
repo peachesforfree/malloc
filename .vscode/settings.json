@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "time.h": "c"
+        "time.h": "c",
+        "*.a": "c",
+        "ft_malloc.h": "c"
     }
 }

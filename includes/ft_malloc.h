@@ -13,9 +13,6 @@
 #ifndef FT_MALLOC_H
 # define FT_MALLOC_H
 
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <sys/mman.h>
 # include "../libft/libft.h"
 
@@ -29,6 +26,9 @@
 # define SMALL_ZONE		128
 # define SAFEZONE		1
 # define INDEX_COUNT	3
+# define DUMP			1
+# define DETAIL			2
+
 typedef struct	__attribute__((packed))	s_chunk
 {
 	size_t		size;
@@ -47,11 +47,15 @@ typedef struct __attribute__((packed))	s_head
 
 extern void		*g_slabs[INDEX_COUNT];
 
-void	ft_free(void *ptr);
-void	*ft_malloc(size_t size);
-void	*realloc(void *ptr, size_t size);
-//void	show_alloc_mem();
-int		main(int argc, char **argv);
+void		free(void *ptr);
+void		*malloc(size_t size);
+void		*realloc(void *ptr, size_t size);
+int			main(int argc, char **argv);
+t_head		*find_zone(void *ptr, int *index);
+t_chunk		*find_chunk(t_head *head, void *ptr);
+void		show_alloc_mem(int call);
+
+
 
 
 #endif

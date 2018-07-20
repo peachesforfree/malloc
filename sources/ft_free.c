@@ -42,10 +42,9 @@ void	deallocate_zone(int index, t_head *head)
 		while (prev->next_zone != head)
 			prev = prev->next_zone;
 	}
-	else 
+	else
 		prev = NULL;
 	next = head->next_zone;
-	//printf("pref zone: %p\tafter zone: %p\t g_slab[%d]=%p ", prev, next, index, &g_slabs[index]);
 	if (prev != NULL)
 		prev->next_zone = next;
 	else if (prev == NULL && next != NULL)
@@ -79,7 +78,7 @@ t_head		*find_zone(void *ptr, int *index)
 t_chunk		*find_chunk(t_head *head, void *ptr)
 {
 	t_chunk	*chunk;
-	
+
 	chunk = head->meta_start;
 	while (chunk != NULL)
 	{
@@ -90,16 +89,7 @@ t_chunk		*find_chunk(t_head *head, void *ptr)
 	return (NULL);
 }
 
-void		deallocate_chunk(void *ptr)
-{
-	t_chunk *chunk;
-
-	chunk = ptr;
-	chunk->used = 0;
-	//printf("chunk_dealocated: %d\t", chunk->used);
-}
-
-void	ft_free(void *ptr)
+void	free(void *ptr)
 {
 	int		index;
 	t_chunk	*chunk;
@@ -114,8 +104,7 @@ void	ft_free(void *ptr)
 	chunk = find_chunk(head, ptr);
 	if (chunk == NULL)
 		return ;
-//printf("\tINDEX: %d\tptr: %p\t",index, &ptr);
-	deallocate_chunk(ptr);
+	chunk->used = 0;
 	if (empty_zone(head))
 		deallocate_zone(index, head);
 }
